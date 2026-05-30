@@ -2,18 +2,19 @@ namespace SpaceBattle.Lib;
 
 using App;
 
-public class RegisterIoCDependencyActionsStart : ICommand
+public class RegisterIoCDependencyActionsStop : ICommand
 {
     public void Execute()
     {
         Ioc.Resolve<App.ICommand>(
             "IoC.Register",
-            "Actions.Start",
+            "Actions.Stop",
             (object[] args) =>
             {
                 var order = (IDictionary<string, object>)args[0];
-                return new StartCommand(order);
+                return new StopCommand(order);
             }
         ).Execute();
     }
 }
+
