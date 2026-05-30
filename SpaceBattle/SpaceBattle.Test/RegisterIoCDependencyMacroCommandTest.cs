@@ -33,3 +33,4 @@ public class RegisterIoCDependencyMacroCommandTest
         Assert.IsType<MacroCommand>(macroCmd);
     }
 }
+
