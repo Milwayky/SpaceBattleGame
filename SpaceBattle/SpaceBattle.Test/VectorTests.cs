@@ -110,5 +110,45 @@ public class VectorTests
         var v2 = new Vector(1, 2, 3);
         Assert.False(v1.Equals(v2));
     }
+
+    [Fact]
+    public void OperatorEqual_NullLeft_ReturnsFalse()
+    {
+        Vector? v1 = null;
+        var v2 = new Vector(1, 2);
+        Assert.False(v1 == v2);
+    }
+
+    [Fact]
+    public void OperatorEqual_NullRight_ReturnsFalse()
+    {
+        var v1 = new Vector(1, 2);
+        Vector? v2 = null;
+        Assert.False(v1 == v2);
+    }
+
+    [Fact]
+    public void OperatorNotEqual_NullLeft_ReturnsTrue()
+    {
+        Vector? v1 = null;
+        var v2 = new Vector(1, 2);
+        Assert.True(v1 != v2);
+    }
+
+    [Fact]
+    public void OperatorNotEqual_NullRight_ReturnsTrue()
+    {
+        var v1 = new Vector(1, 2);
+        Vector? v2 = null;
+        Assert.True(v1 != v2);
+    }
+
+    [Fact]
+    public void OperatorEqual_BothNull_ReturnsTrue()
+    {
+        Vector? v1 = null;
+        Vector? v2 = null;
+        Assert.True(v1 == v2);
+    }
 }   
 
