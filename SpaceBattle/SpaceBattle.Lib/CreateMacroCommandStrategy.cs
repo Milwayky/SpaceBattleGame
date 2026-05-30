@@ -22,3 +22,4 @@ public class CreateMacroCommandStrategy
         return Ioc.Resolve<SpaceBattle.Lib.ICommand>("Commands.Macro", commands);
     }
 }
+
