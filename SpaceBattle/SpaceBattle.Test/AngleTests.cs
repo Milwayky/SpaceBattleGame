@@ -48,6 +48,14 @@ public class AngleTests
     }
 
     [Fact]
+    public void Equals_ShouldBeFalse_ForNullOrDifferentType()
+    {
+        var a = new Angle(1);
+        Assert.False(a.Equals(null));
+        Assert.False(a.Equals("not an angle"));
+    }
+
+    [Fact]
     public void InequalityOperator_ShouldBeTrue_ForDifferentAngles()
     {
         var a = new Angle(1);
@@ -69,6 +77,23 @@ public class AngleTests
         var a = new Angle(4);
         double res = Math.Cos(a);
         Assert.Equal(-1.0, res, 5);
+    }
+
+    [Fact]
+    public void EqualityOperators_ShouldHandleNull()
+    {
+        var a = new Angle(1);
+        Assert.False(a == null);
+        Assert.False(null == a);
+        Assert.True(a != null);
+        Assert.True(null != a);
+    }
+
+    [Fact]
+    public void Constructor_ShouldHandleNegativeAngles()
+    {
+        var a = new Angle(-1);
+        Assert.Equal(7, a.n);
     }
 }
 
