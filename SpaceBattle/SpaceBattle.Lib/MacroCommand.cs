@@ -13,8 +13,17 @@ public class MacroCommand : ICommand
     }
 
     public void Execute()
+{
+    ExecuteCommands(_commands.GetEnumerator());
+}
+
+    private void ExecuteCommands(IEnumerator<ICommand> enumerator)
     {
-        _commands.ToList().ForEach(c => c.Execute());
+        if (enumerator.MoveNext())
+        {
+            enumerator.Current.Execute();
+            ExecuteCommands(enumerator);
+        }
     }
 }
 
