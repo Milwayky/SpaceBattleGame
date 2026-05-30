@@ -84,7 +84,31 @@ public class VectorTests
     {
         var v1 = new Vector(5, 10);
         var v2 = new Vector(5, 10);
+        
         Assert.Equal(v1.GetHashCode(), v2.GetHashCode());
+    }
+
+
+    [Fact]
+    public void Equals_NullObject_ReturnsFalse()
+    {
+        var v1 = new Vector(1, 2);
+        Assert.False(v1.Equals(null));
+    }
+
+    [Fact]
+    public void Equals_DifferentTypeObject_ReturnsFalse()
+    {
+        var v1 = new Vector(1, 2);
+        Assert.False(v1.Equals("not a vector"));
+    }
+
+    [Fact]
+    public void Equals_DifferentDimension_ReturnsFalse()
+    {
+        var v1 = new Vector(1, 2);
+        var v2 = new Vector(1, 2, 3);
+        Assert.False(v1.Equals(v2));
     }
 }   
 
