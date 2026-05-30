@@ -1,6 +1,7 @@
 using Xunit;
 using System;
 using SpaceBattle.Lib;
+using System.Linq;
 
 namespace SpaceBattle.Tests;
 public class VectorTests

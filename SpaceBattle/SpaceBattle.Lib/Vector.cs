@@ -29,8 +29,15 @@ public class Vector
         return _coordinates.SequenceEqual(other._coordinates);
     }
 
-    public static bool operator ==(Vector? v1, Vector? v2) => Equals(v1, v2);
-    public static bool operator !=(Vector? v1, Vector? v2) => !Equals(v1, v2);
+
+    public static bool operator ==(Vector? v1, Vector? v2)
+    {
+        if (ReferenceEquals(v1, v2)) return true;
+        if (v1 is null || v2 is null) return false;
+        return v1.Equals(v2);
+    }
+
+    public static bool operator !=(Vector? v1, Vector? v2) => !(v1 == v2);
 
     public override int GetHashCode()
     {
