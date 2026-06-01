@@ -51,5 +51,41 @@ public class PhotonTorpedoTests
 
         Assert.Throws<InvalidOperationException>(() => { var p = torpedo.Position; });
     }
+
+    [Fact]
+    public void ShouldCorrectlyStoreAndRetrieveVelocity()
+    {
+        var storage = new Dictionary<string, object>();
+        var torpedo = new SpaceTorpedo(storage);
+        var vel = new Vector([5, 5]);
+
+        torpedo.Velocity = vel;
+
+        Assert.Equal(vel, torpedo.Velocity);
+    }
+
+    [Fact]
+    public void ShouldThrowWhenVelocityAccessFails()
+    {
+        var mockStorage = new Mock<IDictionary<string, object>>();
+        mockStorage.SetupGet(s => s[It.IsAny<string>()]).Throws(new InvalidOperationException());
+        
+        var torpedo = new SpaceTorpedo(mockStorage.Object);
+
+        Assert.Throws<InvalidOperationException>(() => { var v = torpedo.Velocity; });
+    }
+
+    [Fact]
+    public void ShouldThrowWhenSettingVelocityFails()
+    {
+        var mockStorage = new Mock<IDictionary<string, object>>();
+        
+        mockStorage.SetupSet(s => s[It.IsAny<string>()] = It.IsAny<object>())
+                .Throws(new InvalidOperationException());
+        
+        var torpedo = new SpaceTorpedo(mockStorage.Object);
+
+        Assert.Throws<InvalidOperationException>(() => torpedo.Velocity = new Vector([1, 1]));
+    }
 }
 

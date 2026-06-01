@@ -22,8 +22,6 @@ public class SpaceTorpedo : IShootable, IMoving
 
     private void UpdateOrAddData(string key, object value)
     {
-        if (_data.TryGetValue(key, out _)) _data[key] = value;
-        else _data.Add(key, value);
+        _data[key] = value;
     }
 }
-
