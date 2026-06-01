@@ -1,0 +1,55 @@
+using Moq;
+using SpaceBattle.Lib;
+using Xunit;
+
+public class PhotonTorpedoTests
+{
+    [Fact]
+    public void ShouldCorrectlyStoreAndRetrieveState()
+    {
+        var storage = new Dictionary<string, object>();
+        var torpedo = new SpaceTorpedo(storage);
+        var pos = new Vector([10, 20]);
+
+        torpedo.Position = pos;
+
+        Assert.Equal(pos, torpedo.Position);
+    }
+
+    [Fact]
+    public void ShouldBeCompatibleWithMoveCommand()
+    {
+        var data = new Dictionary<string, object> {
+            ["Position"] = new Vector([0, 0]),
+            ["Velocity"] = new Vector([1, 1])
+        };
+        var torpedo = new SpaceTorpedo(data);
+        var move = new MoveCommand(torpedo);
+
+        move.Execute();
+
+        Assert.Equal(new Vector([1, 1]), torpedo.Position);
+    }
+
+    [Fact]
+    public void ShouldThrowExceptionIfDataIsMissing()
+    {
+        var emptyData = new Dictionary<string, object>();
+        var torpedo = new SpaceTorpedo(emptyData);
+        var move = new MoveCommand(torpedo);
+
+        Assert.Throws<KeyNotFoundException>(() => move.Execute());
+    }
+
+    [Fact]
+    public void ShouldThrowWhenStorageAccessFails()
+    {
+        var mockStorage = new Mock<IDictionary<string, object>>();
+        mockStorage.SetupGet(s => s[It.IsAny<string>()]).Throws(new InvalidOperationException());
+        
+        var torpedo = new SpaceTorpedo(mockStorage.Object);
+
+        Assert.Throws<InvalidOperationException>(() => { var p = torpedo.Position; });
+    }
+}
+
