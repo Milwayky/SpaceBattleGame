@@ -87,5 +87,32 @@ public class PhotonTorpedoTests
 
         Assert.Throws<InvalidOperationException>(() => torpedo.Velocity = new Vector([1, 1]));
     }
+
+    [Fact]
+    public void ShouldCorrectlyStoreAndRetrieveDirection()
+    {
+        var storage = new Dictionary<string, object>();
+        var torpedo = new SpaceTorpedo(storage);
+        var angle = new Angle(90);
+
+        torpedo.Direction = angle;
+
+        Assert.Equal(angle, torpedo.Direction);
+    }
+
+    [Fact]
+    public void GettersShouldReturnCorrectValues()
+    {
+        var data = new Dictionary<string, object> {
+            ["Position"] = new Vector([1, 1]),
+            ["Velocity"] = new Vector([2, 2]),
+            ["Direction"] = new Angle(45)
+        };
+        var torpedo = new SpaceTorpedo(data);
+
+        Assert.Equal(torpedo.Position, torpedo.GetPosition());
+        Assert.Equal(torpedo.Velocity, torpedo.GetVelocity());
+        Assert.Equal(torpedo.Direction, torpedo.GetDirection());
+    }
 }
 
