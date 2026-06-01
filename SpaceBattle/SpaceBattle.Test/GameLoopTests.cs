@@ -64,5 +64,61 @@ public class GameLoopTests
 
         handlerMock.Verify(h => h.Execute(), Times.Once);
     }
+
+    [Fact]
+    public void GameLoopConditionCommand_ShouldRegisterNewShouldContinueCondition()
+    {
+        // Настраиваем окружение для GameLoopConditionCommand
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Queue", (object[] args) => new Mock<IGameQueue>().Object).Execute();
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.StartTime.Get", (object[] args) => 0).Execute();
+        
+        var mockSetTime = new Mock<ICommand>();
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.StartTime.Set", (object[] args) => mockSetTime.Object).Execute();
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.CheckStatus", (object[] args) => true).Execute();
+
+        var conditionCommand = new GameLoopConditionCommand();
+        conditionCommand.Execute();
+
+        // Проверяем, что команда установки времени выполнилась
+        mockSetTime.Verify(m => m.Execute(), Times.Once);
+
+        // Проверяем, что перерегистрация Game.Loop.ShouldContinue прошла успешно и возвращает true
+        var result = Ioc.Resolve<bool>("Game.Loop.ShouldContinue");
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void RegisterSchedulerDependencies_ShouldRegisterQueueDependencies()
+    {
+        var mockQueue = new Mock<IGameQueue>();
+        mockQueue.Setup(q => q.Count).Returns(5);
+        var mockCmd = new Mock<ICommand>();
+        mockQueue.Setup(q => q.Dequeue()).Returns(mockCmd.Object);
+
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Queue", (object[] args) => mockQueue.Object).Execute();
+
+        // Выполняем регистратор зависимостей
+        var registerCommand = new RegisterSchedulerDependencies();
+        registerCommand.Execute();
+
+        // Проверяем работу зарегистрированного ShouldContinue
+        var shouldContinue = (bool)Ioc.Resolve<object>("Game.Loop.ShouldContinue");
+        Assert.True(shouldContinue);
+
+        // Проверяем работу зарегистрированного DequeueCommand
+        var dequeuedCmd = Ioc.Resolve<ICommand>("Game.Loop.DequeueCommand");
+        Assert.Same(mockCmd.Object, dequeuedCmd);
+    }
+
+    [Fact]
+    public void UpdateGameCommand_ShouldExecuteGameUpdate()
+    {
+        var gameMock = new Mock<IGame>();
+        var updateCommand = new UpdateGameCommand(gameMock.Object);
+
+        updateCommand.Execute();
+
+        gameMock.Verify(g => g.Update(), Times.Once);
+    }
 }
 
