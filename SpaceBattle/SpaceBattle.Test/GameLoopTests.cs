@@ -68,13 +68,17 @@ public class GameLoopTests
     [Fact]
     public void GameLoopConditionCommand_ShouldRegisterNewShouldContinueCondition()
     {
-        // Настраиваем окружение для GameLoopConditionCommand
+        // Регистрируем Game.Queue, возвращая мок
         Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Queue", (object[] args) => new Mock<IGameQueue>().Object).Execute();
-        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.StartTime.Get", (object[] args) => 0).Execute();
+        
+        // КРИТИЧЕСКИЙ ФИКС: явно приводим 0 к object, чтобы IoC не падал с InvalidCastException
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.StartTime.Get", (object[] args) => (object)0).Execute();
         
         var mockSetTime = new Mock<ICommand>();
         Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.StartTime.Set", (object[] args) => mockSetTime.Object).Execute();
-        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.CheckStatus", (object[] args) => true).Execute();
+        
+        // Тут тоже кастуем к object на всякий случай
+        Ioc.Resolve<App.ICommand>("IoC.Register", "Game.Loop.CheckStatus", (object[] args) => (object)true).Execute();
 
         var conditionCommand = new GameLoopConditionCommand();
         conditionCommand.Execute();
