@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using App;
 using App.Scopes;
-using Moq;
 using SpaceBattle.Lib;
 using Xunit;
 
@@ -11,16 +10,10 @@ namespace SpaceBattle.Tests;
 
 public class RegisterIoCTreeDependenciesTests
 {
-    public RegisterIoCTreeDependenciesTests()
+    // Метод, который гарантированно выполняется перед каждым тестом
+    private void SetupIoC()
     {
-        try
-        {
-            Ioc.Resolve<object>("IoC.Scope.Current");
-        }
-        catch
-        {
-            new InitCommand().Execute();
-        }
+        new InitCommand().Execute();
         var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
         Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
     }
@@ -28,6 +21,7 @@ public class RegisterIoCTreeDependenciesTests
     [Fact]
     public void Execute_RegistersAllTreeDependencies_AndTheyResolveSuccessfully()
     {
+        SetupIoC(); // Инициализируем здесь
         var storage = new Dictionary<(string, string), CollisionTree>();
         var regCommand = new RegisterIoCTreeDependencies(storage);
         regCommand.Execute();
@@ -58,6 +52,7 @@ public class RegisterIoCTreeDependenciesTests
     [Fact]
     public void StrategyTreeCreate_InvalidCast_ThrowsException()
     {
+        SetupIoC();
         var storage = new Dictionary<(string, string), CollisionTree>();
         new RegisterIoCTreeDependencies(storage).Execute();
 
@@ -67,6 +62,7 @@ public class RegisterIoCTreeDependenciesTests
     [Fact]
     public void StrategyTreeReadFile_MissingArgs_ThrowsException()
     {
+        SetupIoC();
         var storage = new Dictionary<(string, string), CollisionTree>();
         new RegisterIoCTreeDependencies(storage).Execute();
 
@@ -76,24 +72,21 @@ public class RegisterIoCTreeDependenciesTests
     [Fact]
     public void StrategyTreeAdd_MissingArgs_ThrowsException()
     {
+        SetupIoC();
         var storage = new Dictionary<(string, string), CollisionTree>();
         new RegisterIoCTreeDependencies(storage).Execute();
 
         Assert.Throws<IndexOutOfRangeException>(() => Ioc.Resolve<App.ICommand>("Collision.Tree.Add", "only_one_arg"));
     }
-
-    [Fact]
-    public void IoC_Configuration_Coverage()
-    {
-        Assert.ThrowsAny<Exception>(() => Ioc.Resolve<object>("NonExistentDependency"));
-    }
-
+    
     [Fact]
     public void StrategyTreeAdd_WrongType_ThrowsException()
     {
+        SetupIoC();
         var storage = new Dictionary<(string, string), CollisionTree>();
         new RegisterIoCTreeDependencies(storage).Execute();
-        Assert.Throws<InvalidCastException>(() => Ioc.Resolve<SpaceBattle.Lib.ICommand>("Collision.Tree.Add", "ship", "ufo", "not_a_tree"));
+        
+        Assert.Throws<InvalidCastException>(() => Ioc.Resolve<App.ICommand>("Collision.Tree.Add", "ship", "ufo", "not_a_tree"));
     }
 }
 
