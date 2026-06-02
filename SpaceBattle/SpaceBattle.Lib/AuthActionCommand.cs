@@ -37,6 +37,9 @@ public class AuthActionCommand : ICommand
             case AuthActionType.Remove:
                 _repository.RemovePermission(_subjectId, _objectId, _action);
                 break;
+            
+            default:
+                throw new ArgumentOutOfRangeException();
         }
     }
 }

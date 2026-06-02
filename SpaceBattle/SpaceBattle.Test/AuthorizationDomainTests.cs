@@ -1,4 +1,3 @@
-
 using App;
 using App.Scopes;
 using Moq;
@@ -12,8 +11,6 @@ namespace SpaceBattle.Lib.Tests;
 [Collection("SequentialTests")]
 public class AuthorizationDomainTests
 {
-    #region Универсальные Тесты Команд (AuthActionCommand)
-
     [Fact]
     public void Execute_AddPermission_ShouldInvokeRepository()
     {
@@ -57,9 +54,16 @@ public class AuthorizationDomainTests
         Assert.Throws<KeyNotFoundException>(() => command.Execute());
     }
 
-    #endregion
+    [Fact]
+    public void Execute_UnknownActionType_ShouldThrowArgumentOutOfRangeException()
+    {
+        var repoMock = new Mock<IAuthRepository>();
+        var invalidType = (AuthActionType)999; 
+        
+        var command = new AuthActionCommand(repoMock.Object, invalidType, "1", "10", "Move");
 
-    #region Тесты Дерева Авторизации (AuthTreeRepository)
+        Assert.Throws<ArgumentOutOfRangeException>(() => command.Execute());
+    }
 
     [Fact]
     public void TreeRepository_ShouldManagePermissionsCorrectly()
@@ -68,12 +72,20 @@ public class AuthorizationDomainTests
         var repo = new AuthTreeRepository(tree);
 
         repo.AddPermission("1", "10", "Move");
+        
+        repo.AddPermission("1", "20", "Move");
+
+        repo.AddPermission("1", "10", "Shoot");
+
         Assert.True(repo.CheckPermission("1", "10", "Move"));
-        Assert.False(repo.CheckPermission("1", "10", "Shoot"));
+        Assert.True(repo.CheckPermission("1", "20", "Move"));
+        Assert.True(repo.CheckPermission("1", "10", "Shoot"));
+        Assert.False(repo.CheckPermission("1", "10", "Fly"));
 
         repo.RemovePermission("1", "10", "Move");
         Assert.False(repo.CheckPermission("1", "10", "Move"));
     }
+
 
     [Fact]
     public void TreeRepository_RemoveNonExistent_ShouldThrowKeyNotFoundException()
@@ -84,14 +96,9 @@ public class AuthorizationDomainTests
         Assert.Throws<KeyNotFoundException>(() => repo.RemovePermission("UserX", "ObjY", "Fly"));
     }
 
-    #endregion
-
-    #region Тесты Инфраструктуры IoC
-
     [Fact]
     public void IoCRegistration_ShouldResolveCorrectCommands()
     {
-        // Инициализируем окружение IoC
         new InitCommand().Execute();
         var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
         Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
@@ -111,7 +118,5 @@ public class AuthorizationDomainTests
         Assert.IsType<AuthActionCommand>(removeCmd);
         Assert.Throws<UnauthorizedAccessException>(() => checkCmd.Execute());
     }
-
-    #endregion
 }
 
