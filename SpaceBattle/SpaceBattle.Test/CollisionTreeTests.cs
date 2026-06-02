@@ -37,5 +37,14 @@ public class CollisionTreeTests
         Assert.False(tree.Contains((1, 2, 99, 4))); 
         Assert.False(tree.Contains((1, 2, 3, 99)));
     }
+
+    [Fact]
+    public void Add_FullBranch_WorksCorrectly()
+    {
+        var tree = new CollisionTree(new List<(int, int, int, int)>());
+        tree.Add((1, 2, 3, 4));
+        tree.Add((1, 2, 3, 4)); // Повторное добавление
+        Assert.True(tree.Contains((1, 2, 3, 4)));
+    }
 }
 

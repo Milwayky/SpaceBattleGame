@@ -81,5 +81,11 @@ public class RegisterIoCTreeDependenciesTests
 
         Assert.Throws<IndexOutOfRangeException>(() => Ioc.Resolve<App.ICommand>("Collision.Tree.Add", "only_one_arg"));
     }
+
+    [Fact]
+    public void IoC_Configuration_Coverage()
+    {
+        Assert.ThrowsAny<Exception>(() => Ioc.Resolve<object>("NonExistentDependency"));
+    }
 }
 

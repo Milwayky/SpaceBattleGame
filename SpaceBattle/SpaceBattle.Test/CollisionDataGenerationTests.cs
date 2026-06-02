@@ -44,5 +44,17 @@ public class CollisionDataGenerationTests
         Assert.NotNull(cmd.Tree);
         Assert.True(cmd.Tree.Contains((1, 2, 3, 4)));
     }
+    
+    [Fact]
+    public void CreateCollisionInfo_NoCollision_ReturnsEmptyList()
+    {
+        var cmd = new CreateCollisionInfoCommand(
+            new[] { new Vector(0, 0) }, new[] { new Vector(10, 10) },
+            new[] { 1 }, new[] { 0 }, new[] { 1 }, new[] { 0 }
+        );
+        cmd.Execute();
+        Assert.NotNull(cmd.RelativeStates);
+        Assert.Empty(cmd.RelativeStates);
+    }
 }
 

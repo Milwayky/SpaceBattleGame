@@ -108,5 +108,14 @@ public class CollisionCheckCommandsTests
         mockMove.Verify(m => m.Execute(), Times.Once);
         Assert.Empty(macroCmd.CollidedObjects);
     }
+
+    [Fact]
+    public void CheckCollisions_EmptyStorage_ReturnsEmptyList()
+    {
+        var ship = CreateObj("ship", new[] { 0, 0 }, new[] { 1, 0 });
+        var cmd = new CheckCollisionsCommand(ship, new[] { ship }, new Dictionary<(string, string), CollisionTree>());
+        cmd.Execute();
+        Assert.Empty(cmd.CollidedObjects);
+    }
 }
 
