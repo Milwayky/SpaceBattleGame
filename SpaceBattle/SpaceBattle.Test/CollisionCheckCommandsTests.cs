@@ -117,5 +117,12 @@ public class CollisionCheckCommandsTests
         cmd.Execute();
         Assert.Empty(cmd.CollidedObjects);
     }
+
+    [Fact]
+    public void CheckCollision_WithNullObjects_ThrowsException()
+    {
+        var storage = new Dictionary<(string, string), CollisionTree>();
+        Assert.Throws<NullReferenceException>(() => new CheckCollisionCommand(null!, null!, storage).Execute());
+    }
 }
 

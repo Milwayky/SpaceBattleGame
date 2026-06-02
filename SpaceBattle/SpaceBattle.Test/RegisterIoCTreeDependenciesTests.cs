@@ -87,5 +87,13 @@ public class RegisterIoCTreeDependenciesTests
     {
         Assert.ThrowsAny<Exception>(() => Ioc.Resolve<object>("NonExistentDependency"));
     }
+
+    [Fact]
+    public void StrategyTreeAdd_WrongType_ThrowsException()
+    {
+        var storage = new Dictionary<(string, string), CollisionTree>();
+        new RegisterIoCTreeDependencies(storage).Execute();
+        Assert.Throws<InvalidCastException>(() => Ioc.Resolve<SpaceBattle.Lib.ICommand>("Collision.Tree.Add", "ship", "ufo", "not_a_tree"));
+    }
 }
 

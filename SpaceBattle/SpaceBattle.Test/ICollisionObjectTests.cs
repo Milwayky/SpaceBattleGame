@@ -49,5 +49,27 @@ public class CollisionObjectTests
         Assert.Throws<KeyNotFoundException>(() => collisionObject.Position);
         Assert.Throws<KeyNotFoundException>(() => collisionObject.Velocity);
     }
+
+    [Fact]
+    public void Form_Property_ReturnsValue()
+    {
+        var obj = new CollisionObject(new Dictionary<string, object> { ["Form"] = "ship" });
+        Assert.Equal("ship", obj.Form);
+    }
+
+    [Fact]
+    public void Constructor_WithEmptyDictionary_InitializesSuccessfully()
+    {
+        var emptyData = new Dictionary<string, object>();
+        var obj = new CollisionObject(emptyData);
+        Assert.NotNull(obj);
+    }
+
+    [Fact]
+    public void Position_Property_ThrowsKeyNotFoundException_WhenMissing()
+    {
+        var obj = new CollisionObject(new Dictionary<string, object> { ["Form"] = "ship" });
+        Assert.Throws<KeyNotFoundException>(() => obj.Position);
+    }
 }
 

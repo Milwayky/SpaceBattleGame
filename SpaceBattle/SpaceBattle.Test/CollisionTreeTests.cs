@@ -46,5 +46,14 @@ public class CollisionTreeTests
         tree.Add((1, 2, 3, 4)); // Повторное добавление
         Assert.True(tree.Contains((1, 2, 3, 4)));
     }
+
+    [Fact]
+    public void Add_NewDeepBranch_CreatesPathSuccessfully()
+    {
+        var tree = new CollisionTree(new List<(int, int, int, int)>());
+        tree.Add((1, 2, 3, 4));
+        Assert.True(tree.Contains((1, 2, 3, 4)));
+        Assert.False(tree.Contains((1, 2, 9, 9)));
+    }
 }
 
