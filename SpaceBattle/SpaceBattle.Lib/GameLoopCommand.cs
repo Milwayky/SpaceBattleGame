@@ -4,24 +4,28 @@ namespace SpaceBattle.Lib;
 
 public class GameLoopCommand : ICommand
 {
-    private readonly object _scope;
+    private readonly object _engineContext;
 
-    public GameLoopCommand(object scope) => _scope = scope;
+    public GameLoopCommand(object engineContext)
+    {
+        _engineContext = engineContext;
+    }
 
     public void Execute()
     {
-        Ioc.Resolve<ICommand>("IoC.Scope.Current.Set", _scope).Execute();
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", _engineContext).Execute();
 
-        while (Ioc.Resolve<bool>("Game.Loop.ShouldContinue"))
+        while (Ioc.Resolve<bool>("Engine.Loop.CanProceed"))
         {
-            var cmd = Ioc.Resolve<ICommand>("Game.Loop.DequeueCommand");
+            var nextCmd = Ioc.Resolve<ICommand>("Engine.Loop.FetchNext");
+
             try
             {
-                cmd.Execute();
+                nextCmd.Execute();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Ioc.Resolve<ICommand>("ExceptionHandler.Handle", cmd, e).Execute();
+                Ioc.Resolve<ICommand>("Engine.Errors.Handle", nextCmd, ex).Execute();
             }
         }
     }
