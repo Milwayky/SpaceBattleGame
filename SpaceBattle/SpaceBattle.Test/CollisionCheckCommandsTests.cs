@@ -124,5 +124,6 @@ public class CollisionCheckCommandsTests
         var storage = new Dictionary<(string, string), CollisionTree>();
         Assert.Throws<NullReferenceException>(() => new CheckCollisionCommand(null!, null!, storage).Execute());
     }
+
 }
 
