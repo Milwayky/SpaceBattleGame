@@ -8,9 +8,16 @@ namespace SpaceBattle.Tests;
 
 public class RegisterIoCDependencyAutoAdapterTests
 {
-    public RegisterIoCDependencyAutoAdapterTests()
+    // Используем статический конструктор, чтобы InitCommand 
+    // выполнился только один раз при первом обращении к классу
+    static RegisterIoCDependencyAutoAdapterTests()
     {
         new InitCommand().Execute();
+    }
+
+    public RegisterIoCDependencyAutoAdapterTests()
+    {
+        // Создаем новый scope для каждого теста, чтобы тесты были изолированы
         var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
         Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
     }
