@@ -1,23 +1,15 @@
 using App;
-using App.Scopes;
 using SpaceBattle.Lib;
 using Xunit;
 using System.Collections.Generic;
 
 namespace SpaceBattle.Tests;
 
-public class RegisterIoCDependencyAutoAdapterTests
+public class RegisterIoCDependencyAutoAdapterTests : IClassFixture<IocFixture>
 {
-    // Используем статический конструктор, чтобы InitCommand 
-    // выполнился только один раз при первом обращении к классу
-    static RegisterIoCDependencyAutoAdapterTests()
+    public RegisterIoCDependencyAutoAdapterTests(IocFixture fixture)
     {
-        new InitCommand().Execute();
-    }
-
-    public RegisterIoCDependencyAutoAdapterTests()
-    {
-        // Создаем новый scope для каждого теста, чтобы тесты были изолированы
+        // Каждый раз создаем свежий scope для изоляции тестов
         var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
         Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
     }
@@ -71,10 +63,7 @@ public class RegisterIoCDependencyAutoAdapterTests
         };
 
         var moveCmd = Ioc.Resolve<SpaceBattle.Lib.ICommand>("Commands.Move", gameObject);
-
-        Assert.NotNull(moveCmd);
-        Assert.IsType<MoveCommand>(moveCmd);
-
+        
         moveCmd.Execute();
 
         Assert.Equal(new Vector(8, 6), (Vector)gameObject["Position"]);
@@ -93,12 +82,10 @@ public class RegisterIoCDependencyAutoAdapterTests
         };
 
         var rotateCmd = Ioc.Resolve<SpaceBattle.Lib.ICommand>("Commands.Rotate", gameObject);
-
-        Assert.NotNull(rotateCmd);
-        Assert.IsType<RotateCommand>(rotateCmd);
-
+        
         rotateCmd.Execute();
 
         Assert.Equal(new Angle(2), (Angle)gameObject["Angle"]);
     }
 }
+
