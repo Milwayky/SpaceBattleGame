@@ -49,5 +49,30 @@ public class CollisionObjectTests
         Assert.Throws<KeyNotFoundException>(() => collisionObject.Position);
         Assert.Throws<KeyNotFoundException>(() => collisionObject.Velocity);
     }
+
+    [Fact]
+    public void PartialMissingProperty_ThrowsKeyNotFoundException_ForVelocity()
+    {
+        var gameObject = new Dictionary<string, object>
+        {
+            ["Form"] = "ship",
+            ["Position"] = new Vector(1, 2)
+        };
+
+        var collisionObject = new CollisionObject(gameObject);
+
+        Assert.Equal("ship", collisionObject.Form);
+        Assert.Equal(new Vector(1, 2), collisionObject.Position);
+        Assert.Throws<KeyNotFoundException>(() => collisionObject.Velocity);
+    }
+
+    [Fact]
+    public void GetValue_ReturnsCorrectValue_WhenKeyExists()
+    {
+        var gameObject = new Dictionary<string, object> { ["Type"] = "torpedo" };
+        var collisionObject = new CollisionObject(gameObject);
+        
+        Assert.Equal("torpedo", collisionObject.Form);
+    }
 }
 
