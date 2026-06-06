@@ -27,7 +27,6 @@ public class CheckCollisionsCommand : ICommand
         {
             if (ReferenceEquals(_target, obj)) continue;
 
-            // Здесь вызывается GetRelativeState -> GetCoords -> БРОСОК ИСКЛЮЧЕНИЯ
             if (_storage.TryGetValue((_target.Form, obj.Form), out var tree))
             {
                 if (tree.Contains(GetRelativeState(_target, obj)))
