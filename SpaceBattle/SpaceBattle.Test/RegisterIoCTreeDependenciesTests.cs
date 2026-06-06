@@ -85,3 +85,4 @@ public class RegisterIoCTreeDependenciesTests
         Assert.ThrowsAny<Exception>(() => Ioc.Resolve<object>("NonExistentDependency"));
     }
 }
+

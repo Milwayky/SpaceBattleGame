@@ -31,8 +31,9 @@ public class RegisterIoCTreeDependencies : ICommand
             (object[] args) => new CollisionObject((IDictionary<string, object>)args[0])).Execute();
 
         Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.Check", (object[] args) => {
-            var f = ResolveObj(args[0]); var s = ResolveObj(args[1]);
-            return new CheckCollisionCommand(f, s, _storage);
+            var f = ResolveObj(args[0]); 
+            var s = ResolveObj(args[1]);
+            return new CheckCollisionsCommand(f, new[] { s }, _storage);
         }).Execute();
 
         Ioc.Resolve<App.ICommand>("IoC.Register", "Collision.CheckAll", (object[] args) => {

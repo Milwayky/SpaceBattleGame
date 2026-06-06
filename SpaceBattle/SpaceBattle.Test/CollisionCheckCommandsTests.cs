@@ -29,7 +29,7 @@ public class CollisionCheckCommandsTests
         var ship = CreateObj("ship", new[] { 0, 0 }, new[] { 0, 0 });
         var torpedo = CreateObj("torpedo", new[] { 1, 1 }, new[] { 1, 1 });
 
-        var cmd = new CheckCollisionCommand(ship, torpedo, storage);
+        var cmd = new CheckCollisionsCommand(ship, new[] { torpedo }, storage);
         cmd.Execute();
 
         Assert.True(cmd.HasCollision);
@@ -38,14 +38,17 @@ public class CollisionCheckCommandsTests
     [Fact]
     public void CheckCollision_ReverseTreeHit_SetsHasCollisionTrue()
     {
+        var state = (1, 1, 1, 1);
+        var tree = new CollisionTree(new[] { state });
         var storage = new Dictionary<(string, string), CollisionTree>
         {
-            [("torpedo", "ship")] = new CollisionTree(new[] { (-1, -1, -1, -1) })
+            [("torpedo", "ship")] = tree,
+            [("ship", "torpedo")] = tree
         };
         var ship = CreateObj("ship", new[] { 0, 0 }, new[] { 0, 0 });
         var torpedo = CreateObj("torpedo", new[] { 1, 1 }, new[] { 1, 1 });
 
-        var cmd = new CheckCollisionCommand(ship, torpedo, storage);
+        var cmd = new CheckCollisionsCommand(ship, new[] { torpedo }, storage);
         cmd.Execute();
 
         Assert.True(cmd.HasCollision);
@@ -58,7 +61,7 @@ public class CollisionCheckCommandsTests
         var ship = CreateObj("ship", new[] { 0, 0 }, new[] { 0, 0 });
         var torpedo = CreateObj("torpedo", new[] { 1, 1 }, new[] { 1, 1 });
 
-        var cmd = new CheckCollisionCommand(ship, torpedo, storage);
+        var cmd = new CheckCollisionsCommand(ship, new[] { torpedo }, storage);
         cmd.Execute();
 
         Assert.False(cmd.HasCollision);
@@ -67,11 +70,18 @@ public class CollisionCheckCommandsTests
     [Fact]
     public void CheckCollision_InvalidVectorDimension_ThrowsArgumentException()
     {
-        var storage = new Dictionary<(string, string), CollisionTree>();
-        var brokenShip = CreateObj("ship", new[] { 1 }, new[] { 0, 0 }); // 1D вектор
+        var storage = new Dictionary<(string, string), CollisionTree> { 
+        [("ship", "torpedo")] = new CollisionTree(new[] { (0, 0, 0, 0) }) 
+        };
+        var brokenShip = new CollisionObject(new Dictionary<string, object>
+        {
+            ["Form"] = "ship",
+            ["Position"] = new Vector(1),
+            ["Velocity"] = new Vector(0, 0)
+        });
         var torpedo = CreateObj("torpedo", new[] { 1, 1 }, new[] { 1, 1 });
 
-        var cmd = new CheckCollisionCommand(brokenShip, torpedo, storage);
+        var cmd = new CheckCollisionsCommand(brokenShip, new[] { torpedo }, storage);
 
         Assert.Throws<ArgumentException>(() => cmd.Execute());
     }
@@ -122,8 +132,7 @@ public class CollisionCheckCommandsTests
     public void CheckCollision_WithNullObjects_ThrowsException()
     {
         var storage = new Dictionary<(string, string), CollisionTree>();
-        Assert.Throws<NullReferenceException>(() => new CheckCollisionCommand(null!, null!, storage).Execute());
+        Assert.Throws<NullReferenceException>(() => new CheckCollisionsCommand(null!, null!, storage).Execute());
     }
-
 }
 
