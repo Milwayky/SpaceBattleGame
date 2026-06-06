@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using App;
 using App.Scopes;
-using Moq;
 using SpaceBattle.Lib;
 using Xunit;
 
@@ -13,24 +12,22 @@ public class RegisterIoCTreeDependenciesTests
 {
     public RegisterIoCTreeDependenciesTests()
     {
-        try
-        {
-            Ioc.Resolve<object>("IoC.Scope.Current");
-        }
-        catch
-        {
-            new InitCommand().Execute();
-        }
-        var iocScope = Ioc.Resolve<object>("IoC.Scope.Create");
-        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", iocScope).Execute();
+        new InitCommand().Execute();
+        
+        Ioc.Resolve<App.ICommand>("IoC.Register", "IoC.Resolve", (object[] args) => {
+            var scope = Ioc.Resolve<IDictionary<string, object>>("IoC.Scope.Current.Storage");
+            return ((Func<object[], object>)scope[(string)args[0]])(args[1..]);
+        }).Execute();
+
+        var scope = Ioc.Resolve<object>("IoC.Scope.Create");
+        Ioc.Resolve<App.ICommand>("IoC.Scope.Current.Set", scope).Execute();
     }
 
     [Fact]
     public void Execute_RegistersAllTreeDependencies_AndTheyResolveSuccessfully()
     {
         var storage = new Dictionary<(string, string), CollisionTree>();
-        var regCommand = new RegisterIoCTreeDependencies(storage);
-        regCommand.Execute();
+        new RegisterIoCTreeDependencies(storage).Execute();
 
         var quads = new List<(int, int, int, int)> { (1, 2, 3, 4) };
         var createTree = Ioc.Resolve<SpaceBattle.Lib.ICommand>("CollisionTree.Create", quads);
@@ -88,4 +85,3 @@ public class RegisterIoCTreeDependenciesTests
         Assert.ThrowsAny<Exception>(() => Ioc.Resolve<object>("NonExistentDependency"));
     }
 }
-
