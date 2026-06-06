@@ -68,3 +68,4 @@ public class RegisterIoCDependencyActionsStartTests
         receiverMock.Verify(r => r.Receive(It.IsAny<Lib.ICommand>()), Times.AtLeastOnce);
     }
 }
+
